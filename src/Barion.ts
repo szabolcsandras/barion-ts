@@ -42,7 +42,9 @@ export default class Barion {
     public async startPayment(p: Payment): Promise<PaymentResult> {
         return new Promise(async (resolve, reject) => {
             axios.post('/v2/Payment/Start', p.makeBarionCompatible())
-                .then(r => resolve(new PaymentResult(r.data)))
+                .then(r => {
+                    return resolve(new PaymentResult(r.data));
+                })
                 .catch(e => {
                     if (e.response) {
                         if (e.response.data) {
@@ -98,7 +100,6 @@ export default class Barion {
                     POSKey,
                     PaymentId,
                 });
-                console.log(r.data);
                 return resolve(new PaymentCompletion(r.data));
             } catch (ex) {
                 console.log("EXXX:", ex);

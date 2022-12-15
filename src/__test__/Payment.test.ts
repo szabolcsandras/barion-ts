@@ -9,9 +9,11 @@ test('Payment', () => {
     DelayedCapturePeriod: 'd',
     PaymentWindow: "x",
     GuestCheckOut: true,
+    InitiateRecurrence: true,
     RecurrenceId: 'e',
     FundingSources: ["f"],
     PaymentRequestId: 'g',
+    RecurrenceType: "x",
     RedirectUrl: 'h',
     CallbackUrl: 'i',
     Transactions: [new PaymentTransaction({
@@ -28,9 +30,11 @@ test('Payment', () => {
   expect(r.DelayedCapturePeriod).toBe(o.DelayedCapturePeriod);
   expect(r.PaymentWindow).toBe(o.PaymentWindow);
   expect(r.GuestCheckOut).toBe(o.GuestCheckOut);
+  expect(r.InitiateRecurrence).toBe(o.InitiateRecurrence);
   expect(r.RecurrenceId).toBe(o.RecurrenceId);
   expect(r.FundingSources).toStrictEqual(o.FundingSources);
   expect(r.PaymentRequestId).toBe(o.PaymentRequestId);
+  expect(r.RecurrenceType).toBe(o.RecurrenceType);
   expect(r.RedirectUrl).toBe(o.RedirectUrl);
   expect(r.CallbackUrl).toBe(o.CallbackUrl);
   expect(r.Transactions[0].POSTransactionId)

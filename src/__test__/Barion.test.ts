@@ -8,6 +8,8 @@ const { v4: uuidv4 } = require('uuid');
 
 require('dotenv').config();
 
+const recurringId = uuidv4();
+
 const testPayment = new Payment({
   POSKey: process.env.BARION_POS_KEY,
   PaymentType: "Immediate",
@@ -20,6 +22,30 @@ const testPayment = new Payment({
   Transactions: [
     new PaymentTransaction({
       POSTransactionId: "aa",
+      Payee: "keknarancs89@gmail.com",
+      Total: 8900,
+      Comment: "comm",
+    })
+  ],
+  Locale: "hu-HU",
+  Currency: "HUF"
+});
+
+const testRecurringPayment = new Payment({
+  POSKey: process.env.BARION_POS_KEY,
+  PaymentType: "Immediate",
+  PaymentWindow: "0.00:30:00",
+  GuestCheckOut: true,
+  FundingSources: ["All"],
+  PaymentRequestId: recurringId,
+  RecurrenceId: recurringId,
+  InitiateRecurrence: true,
+  RecurrenceType: "MerchantInitiatedPayment",
+  RedirectUrl: "http://localhost:8080",
+  CallbackUrl: "http://localhost:8080/cb",
+  Transactions: [
+    new PaymentTransaction({
+      POSTransactionId: recurringId,
       Payee: "keknarancs89@gmail.com",
       Total: 8900,
       Comment: "comm",
@@ -100,12 +126,32 @@ const stateResult = {
   Currency: 'HUF',
   Errors: []
 }
+
+const recurringStateResult = {
+  PaymentId: '1659cfc47a7ced118bea001dd8b71cc4',
+  PaymentRequestId: recurringId,
+  Status: 'Prepared',
+  QRUrl: 'https://api.test.barion.com/qr/generate?paymentId=1659cfc4-7a7c-ed11-8bea-001dd8b71cc4&size=Large',
+  Transactions: [
+    {
+      POSTransactionId: recurringId,
+      TransactionId: '1759cfc47a7ced118bea001dd8b71cc4',
+      Status: 'Prepared',
+      Currency: 'HUF',
+      TransactionTime: '0001-01-01T00:00:00',
+      RelatedId: null
+    }
+  ],
+  RecurrenceResult: 'None',
+  ThreeDSAuthClientData: null,
+  GatewayUrl: 'https://secure.test.barion.com/Pay?Id=1659cfc47a7ced118bea001dd8b71cc4',
+  RedirectUrl: 'http://localhost:8080/?paymentId=1659cfc47a7ced118bea001dd8b71cc4',
+  CallbackUrl: 'http://localhost:8080/cb?paymentId=1659cfc47a7ced118bea001dd8b71cc4',
+  TraceId: null,
+  Errors: []
+};
+
 describe('Barion', () => {
-
-  afterAll(() => {
-    mock.restore();
-  });
-
   describe("startPayment", () => {
     test('should pass', async () => {
       mock.onPost("/v2/Payment/Start").reply(200, startResult);
@@ -118,6 +164,20 @@ describe('Barion', () => {
       expect(res.Transactions.length).toBe(1);
       expect(res.Transactions[0].POSTransactionId)
         .toBe(testPayment.Transactions[0].POSTransactionId);
+      expect(res.Transactions[0].Status)
+        .toBe("Prepared");
+    });
+    test('should pass with recurring', async () => {
+      const barion = new Barion({
+        useTest: true,
+      });
+      mock.onPost("/v2/Payment/Start").reply(200, recurringStateResult);
+      const res = await barion.startPayment(testRecurringPayment);
+      expect(res.Status).toBe("Prepared");
+      expect(res.QRUrl.length).toBeGreaterThan(1);
+      expect(res.Transactions.length).toBe(1);
+      expect(res.Transactions[0].POSTransactionId)
+        .toBe(testRecurringPayment.Transactions[0].POSTransactionId);
       expect(res.Transactions[0].Status)
         .toBe("Prepared");
     });
@@ -140,7 +200,6 @@ describe('Barion', () => {
 
   /* describe("completePayment", () => {
     test('should pass', async () => {
-      console.log(3);
       const barion = new Barion({
         useTest: true,
       });
