@@ -1,9 +1,10 @@
 {
-  "name": "barionts",
-  "version": "1.0.2",
+  "name": "barion-ts",
+  "version": "1.0.8",
   "description": "Barion SmartGateway API integration for NodeJS projects",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"lib/**/*.js\"",
@@ -42,7 +43,6 @@
     "uuid": "^9.0.0"
   },
   "dependencies": {
-    "axios": "^1.2.1",
-    "barion-ts": "^1.0.1"
+    "axios": "0.27.2"
   }
 }

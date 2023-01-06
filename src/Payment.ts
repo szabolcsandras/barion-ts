@@ -70,14 +70,14 @@ export default class Payment {
     /**
      * This flag indicates that the shop would like to initialize a token payment.
      */
-    InitiateRecurrence: boolean = true;
+    InitiateRecurrence: boolean = false;
 
     /**
      * A string used to identify a given token payment. Its purpose is determined
      * by the value of the InitiateRecurrence property. Must be unique per
      * shop and per user. Required when executing token payments.
      */
-    RecurrenceId: string = "";
+    RecurrenceId?: string;
 
     /**
      * An array of strings containing the allowed funding sources that can be used
@@ -135,9 +135,11 @@ export default class Payment {
             this.ReservationPeriod = o.ReservationPeriod || "";
             this.DelayedCapturePeriod = o.DelayedCapturePeriod || "";
             this.PaymentWindow = o.PaymentWindow || "";
-            this.GuestCheckOut = this.GuestCheckOut === true;
-            this.InitiateRecurrence = this.InitiateRecurrence === true;
-            this.RecurrenceId = o.RecurrenceId || "";
+            this.GuestCheckOut = o.GuestCheckOut === true;
+            this.InitiateRecurrence = o.InitiateRecurrence === true;
+            if (o.RecurrenceId !== null && o.RecurrenceId !== undefined) {
+                this.RecurrenceId = o.RecurrenceId;
+            }
             this.FundingSources = o.FundingSources || [];
             this.PaymentRequestId = o.PaymentRequestId || "";
             this.RecurrenceType = o.RecurrenceType || "";
